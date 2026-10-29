@@ -15,5 +15,152 @@
 
 void ImportarFichero(ANIMAL **Fichas,WINDOW *Wfichero,bool sumar)
 {
-    // Código del alumno
+        //variables
+    FILE *fichero;
+    char **Lineas = NULL;
+    struct timeval tiempoInicio, tiempoFinal;
+    char *token;
+    int i, j;                                       //contadores
+    int x, y;                                       //coordenadas para la ventana  
+    int contador = 0;
+    int numeroLineas = 0;
+    int animalesDescartados = 0 ;
+    int animalesTratados = 0;
+    int totalAnimales = 0;
+    int AnimalesLeidos = 0;
+    char buffer[MAX_BUF];
+    int ancho = getmaxx(Wfichero);      //calculamos el ancho de la ventana
+
+    werase(Wfichero);        //Limpiamos la ventana antes de dibujar
+
+    DibujarGestionFichero(Wfichero);        //Pintamos
+    mvwprintw(Wfichero, 0, (ancho - 27) / 2 , "  Importar Fichero de Discos");       //agregalos el titulo faltante    
+    wrefresh(Wfichero);     
+    wgetch(Wfichero);        //mantiene la ventana hasta que el usuario haga algo
+
+
+    //comprobamos el modo
+    if(sumar) {
+        if(Estadisticas.NumeroFichas==0) {      //si pedimos sumar pero no hay fichas da error
+            mvwprintw(Wfichero, 2, 1, "Error, no hay fichas para sumar");
+            wrefresh(Wfichero);
+            getch();
+            return;
+        }
+    } else {
+        if(Estadisticas.NumeroFichas!=0) {      //si sumamos pero ya hay fichas da error
+            mvwprintw(Wfichero, 2, 1, "Error, hay fichas existentes");
+            wrefresh(Wfichero);
+            getch();
+            return;
+        }
+    } 
+
+    //pedir por pantalla el fichero a abrir
+    mvwprintw(Wfichero, 2, 1, "Introduzca el nombre del fichero a abrir:");
+    echo();             //habilitamos la visualización de lo que se escribe
+    wgetstr(Wfichero, buffer);      //leemos la cadena del fichero
+    noecho();           //deshabilitamos la visualización
+
+
+    fichero = fopen(buffer, "r");       //abre el fichero en modo lectura 'r'
+    if (fichero == NULL) {
+        mvwprintw(Wfichero, 4, 1, "Error al abrir el fichero: %s", strerror(errno));
+        wrefresh(Wfichero);
+        getch();
+        return;
+    }
+
+    gettimeofday(&tiempoInicio, NULL);      //guardamos el tiempo de inicio
+    
+    while(fgets(buffer, MAX_BUF,fichero) != NULL) {
+        i = strlen(buffer);       //calculamos la longitud de la linea
+        DiscosLeidos++;           //incrementamos el contador de discos leidos
+    }
+
+    //comprobamos lo que se ha leido
+    if(DiscosLeidos < 2) { //asi lee la cabecera o nada
+        mvwprintw(Wfichero, 4, 1, "Error, el fichero no contiene discos para importar.");
+        wrefresh(Wfichero);
+        getch();
+        fclose(fichero);
+        return;
+    }
+
+
+    totalDiscos = DiscosLeidos - 1 ; //restamos 1 por la cabecera
+    DISCO *nuevasFichas = realloc(*Fichas, (Estadisticas.NumeroFichas + totalDiscos) * sizeof(DISCO));  //redimensionamos el array de discos
+
+    Estadisticas.MaxFichas = Estadisticas.NumeroFichas + totalDiscos; //actualizamos la capacidad maxima 
+
+    if(nuevasFichas == NULL) {      //si realloc falla, no hacemos nada
+        mvwprintw(Wfichero, 4, 1, "Error de memoria al redimensionar los discos."); 
+        wrefresh(Wfichero);
+        getch();
+        fclose(fichero);
+        return;
+    }
+    *Fichas = nuevasFichas;     //si realloc tiene éxito, actualizamos el puntero
+
+
+
+    rewind(fichero); //volvemos al inicio del fichero para leer las lineas
+    DiscosLeidos = 0; //reiniciamos el contador de discos leidos para la importación
+
+    while(fgets(buffer, MAX_BUF, fichero) != NULL) {
+        if(DiscosLeidos == 0) { //si es la primera linea 
+            DiscosLeidos++;
+            continue;           //salto la cabecera
+        }
+        i = strlen(buffer);     //longitud de la linea actual
+        if(buffer[i-1] == '\n') {   //elimina salto de linea final
+            buffer[i-1] = '\0'; 
+        }
+
+        //separamos los tokens por obra, apellido autor, nombre autor, tonalidad, opus y duración
+        
+        char *buffer_ptr = buffer;      //puntero auxiliar para strsep
+
+        char *obra_buf = strsep(&buffer_ptr, ";");
+        char *apellAutor_buf = strsep(&buffer_ptr, ";");
+        char *nomAutor_buf = strsep(&buffer_ptr, ";");
+        char *tonalidad_buf = strsep(&buffer_ptr, ";");
+        char *opus_buf = strsep(&buffer_ptr, ";");
+        char *duracion_buf = strsep(&buffer_ptr, ";");
+
+        //comprobamos que los campos obligatorios no estén vacíos
+        if(*obra_buf == 0 || *apellAutor_buf == 0){ //si no existen estos valores, no se agrega
+            discosDescartados++;
+            continue; //descartamos esta ficha y pasamos a la siguiente
+        }
+
+        //asignamos los valores a la nueva ficha
+        (*Fichas)[discosTratados + DiscosLeidos - 1].Obra = strdup(obra_buf);
+        (*Fichas)[discosTratados + DiscosLeidos - 1].ApellAutor = strdup(apellAutor_buf);
+        (*Fichas)[discosTratados + DiscosLeidos - 1].NomAutor = strdup(nomAutor_buf);
+        (*Fichas)[discosTratados + DiscosLeidos - 1].Tonalidad = strdup(tonalidad_buf);
+        (*Fichas)[discosTratados + DiscosLeidos - 1].Opus = strdup(opus_buf);
+        (*Fichas)[discosTratados + DiscosLeidos - 1].Duracion = strdup(duracion_buf);
+
+        discosTratados++;                       //incrementamos contador de discos tratados
+    }
+
+    fclose(fichero);
+    gettimeofday(&tiempoFinal, NULL);
+
+    //actualizamos las estadisticas
+    Estadisticas.TiempoCarga += DifTiempo(tiempoInicio, tiempoFinal);
+    Estadisticas.Fichero = strdup(buffer);
+
+    Estadisticas.NumeroFichas = discosTratados + DiscosLeidos - 1 ; //total fichas = importadas + leidas - cabecera
+    wrefresh(Wfichero);
+
+    //mostramos resultados
+    mvwprintw(Wfichero, 2, 1, "Nombre del fichero: %s         .", Estadisticas.Fichero);
+    mvwprintw(Wfichero, 3, 1, "Número de fichas: %d", Estadisticas.NumeroFichas);
+    mvwprintw(Wfichero, 4, 1, "Fichas descartadas: %d", discosDescartados);
+    wrefresh(Wfichero);
+    VentanaError("Fichero importado correctamente");
+    getch();
+    return;
 }
