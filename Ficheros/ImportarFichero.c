@@ -75,12 +75,12 @@ void ImportarFichero(ANIMAL **Fichas,WINDOW *Wfichero,bool sumar)
     
     while(fgets(buffer, MAX_BUF,fichero) != NULL) {
         i = strlen(buffer);       //calculamos la longitud de la linea
-        DiscosLeidos++;           //incrementamos el contador de discos leidos
+        AnimalesLeidos++;           //incrementamos el contador de animales leidos
     }
 
     //comprobamos lo que se ha leido
-    if(DiscosLeidos < 2) { //asi lee la cabecera o nada
-        mvwprintw(Wfichero, 4, 1, "Error, el fichero no contiene discos para importar.");
+    if(AnimalesLeidos < 2) { //asi lee la cabecera o nada
+        mvwprintw(Wfichero, 4, 1, "Error, el fichero no contiene animales para importar.");
         wrefresh(Wfichero);
         getch();
         fclose(fichero);
@@ -88,7 +88,7 @@ void ImportarFichero(ANIMAL **Fichas,WINDOW *Wfichero,bool sumar)
     }
 
 
-    totalDiscos = DiscosLeidos - 1 ; //restamos 1 por la cabecera
+    totalDiscos = AnimalesLeidos - 1 ; //restamos 1 por la cabecera
     DISCO *nuevasFichas = realloc(*Fichas, (Estadisticas.NumeroFichas + totalDiscos) * sizeof(DISCO));  //redimensionamos el array de discos
 
     Estadisticas.MaxFichas = Estadisticas.NumeroFichas + totalDiscos; //actualizamos la capacidad maxima 
@@ -105,11 +105,11 @@ void ImportarFichero(ANIMAL **Fichas,WINDOW *Wfichero,bool sumar)
 
 
     rewind(fichero); //volvemos al inicio del fichero para leer las lineas
-    DiscosLeidos = 0; //reiniciamos el contador de discos leidos para la importación
+    AnimalesLeidos = 0; //reiniciamos el contador de animales leidos para la importación
 
     while(fgets(buffer, MAX_BUF, fichero) != NULL) {
-        if(DiscosLeidos == 0) { //si es la primera linea 
-            DiscosLeidos++;
+        if(AnimalesLeidos == 0) { //si es la primera linea 
+            AnimalesLeidos++;
             continue;           //salto la cabecera
         }
         i = strlen(buffer);     //longitud de la linea actual
@@ -130,19 +130,19 @@ void ImportarFichero(ANIMAL **Fichas,WINDOW *Wfichero,bool sumar)
 
         //comprobamos que los campos obligatorios no estén vacíos
         if(*obra_buf == 0 || *apellAutor_buf == 0){ //si no existen estos valores, no se agrega
-            discosDescartados++;
+            animalesDescartados++;
             continue; //descartamos esta ficha y pasamos a la siguiente
         }
 
         //asignamos los valores a la nueva ficha
-        (*Fichas)[discosTratados + DiscosLeidos - 1].Obra = strdup(obra_buf);
-        (*Fichas)[discosTratados + DiscosLeidos - 1].ApellAutor = strdup(apellAutor_buf);
-        (*Fichas)[discosTratados + DiscosLeidos - 1].NomAutor = strdup(nomAutor_buf);
-        (*Fichas)[discosTratados + DiscosLeidos - 1].Tonalidad = strdup(tonalidad_buf);
-        (*Fichas)[discosTratados + DiscosLeidos - 1].Opus = strdup(opus_buf);
-        (*Fichas)[discosTratados + DiscosLeidos - 1].Duracion = strdup(duracion_buf);
+        (*Fichas)[animalesTratados + AnimalesLeidos - 1].Clase = strdup(obra_buf);
+        (*Fichas)[animalesTratados + AnimalesLeidos - 1].Orden = strdup(apellAutor_buf);
+        (*Fichas)[animalesTratados + AnimalesLeidos - 1].Genero = strdup(nomAutor_buf);
+        (*Fichas)[animalesTratados + AnimalesLeidos - 1].Especie = strdup(tonalidad_buf);
+        (*Fichas)[animalesTratados + AnimalesLeidos - 1].Peso = strdup(opus_buf);
+        (*Fichas)[animalesTratados + AnimalesLeidos - 1].Cerebro = strdup(duracion_buf);
 
-        discosTratados++;                       //incrementamos contador de discos tratados
+        animalesTratados++;                       //incrementamos contador de animales tratados
     }
 
     fclose(fichero);
@@ -152,13 +152,13 @@ void ImportarFichero(ANIMAL **Fichas,WINDOW *Wfichero,bool sumar)
     Estadisticas.TiempoCarga += DifTiempo(tiempoInicio, tiempoFinal);
     Estadisticas.Fichero = strdup(buffer);
 
-    Estadisticas.NumeroFichas = discosTratados + DiscosLeidos - 1 ; //total fichas = importadas + leidas - cabecera
+    Estadisticas.NumeroFichas = animalesTratados + AnimalesLeidos - 1 ; //total fichas = importadas + leidas - cabecera
     wrefresh(Wfichero);
 
     //mostramos resultados
     mvwprintw(Wfichero, 2, 1, "Nombre del fichero: %s         .", Estadisticas.Fichero);
     mvwprintw(Wfichero, 3, 1, "Número de fichas: %d", Estadisticas.NumeroFichas);
-    mvwprintw(Wfichero, 4, 1, "Fichas descartadas: %d", discosDescartados);
+    mvwprintw(Wfichero, 4, 1, "Fichas descartadas: %d", animalesDescartados);
     wrefresh(Wfichero);
     VentanaError("Fichero importado correctamente");
     getch();
