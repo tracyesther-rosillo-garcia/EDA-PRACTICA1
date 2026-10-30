@@ -88,10 +88,10 @@ void ImportarFichero(ANIMAL **Fichas,WINDOW *Wfichero,bool sumar)
     }
 
 
-    totalDiscos = AnimalesLeidos - 1 ; //restamos 1 por la cabecera
-    DISCO *nuevasFichas = realloc(*Fichas, (Estadisticas.NumeroFichas + totalDiscos) * sizeof(DISCO));  //redimensionamos el array de discos
+    totalAnimales = AnimalesLeidos - 1 ; //restamos 1 por la cabecera
+    ANIMAL *nuevasFichas = realloc(*Fichas, (Estadisticas.NumeroFichas + totalAnimales) * sizeof(ANIMAL));  //redimensionamos el array de animales
 
-    Estadisticas.MaxFichas = Estadisticas.NumeroFichas + totalDiscos; //actualizamos la capacidad maxima 
+    Estadisticas.MaxFichas = Estadisticas.NumeroFichas + totalAnimales; //actualizamos la capacidad maxima 
 
     if(nuevasFichas == NULL) {      //si realloc falla, no hacemos nada
         mvwprintw(Wfichero, 4, 1, "Error de memoria al redimensionar los discos."); 
@@ -117,30 +117,32 @@ void ImportarFichero(ANIMAL **Fichas,WINDOW *Wfichero,bool sumar)
             buffer[i-1] = '\0'; 
         }
 
-        //separamos los tokens por obra, apellido autor, nombre autor, tonalidad, opus y duración
+        //separamos los tokens por numero del animal, clase, orden, genero, especie, peso y cerebro
         
         char *buffer_ptr = buffer;      //puntero auxiliar para strsep
 
-        char *obra_buf = strsep(&buffer_ptr, ";");
-        char *apellAutor_buf = strsep(&buffer_ptr, ";");
-        char *nomAutor_buf = strsep(&buffer_ptr, ";");
-        char *tonalidad_buf = strsep(&buffer_ptr, ";");
-        char *opus_buf = strsep(&buffer_ptr, ";");
-        char *duracion_buf = strsep(&buffer_ptr, ";");
+        char *numAnimal_buf = strsep(&buffer_ptr, ";");
+        char *clase_buf = strsep(&buffer_ptr, ";");
+        char *orden_buf = strsep(&buffer_ptr, ";");
+        char *genero_buf = strsep(&buffer_ptr, ";");
+        char *especie_buf = strsep(&buffer_ptr, ";");
+        char *peso_buf = strsep(&buffer_ptr, ";");
+        char *cerebro_buf = strsep(&buffer_ptr, ";");
 
         //comprobamos que los campos obligatorios no estén vacíos
-        if(*obra_buf == 0 || *apellAutor_buf == 0){ //si no existen estos valores, no se agrega
+        if(*genero_buf == 0){ //si no existe este valor, no se agrega
             animalesDescartados++;
             continue; //descartamos esta ficha y pasamos a la siguiente
         }
 
         //asignamos los valores a la nueva ficha
-        (*Fichas)[animalesTratados + AnimalesLeidos - 1].Clase = strdup(obra_buf);
-        (*Fichas)[animalesTratados + AnimalesLeidos - 1].Orden = strdup(apellAutor_buf);
-        (*Fichas)[animalesTratados + AnimalesLeidos - 1].Genero = strdup(nomAutor_buf);
-        (*Fichas)[animalesTratados + AnimalesLeidos - 1].Especie = strdup(tonalidad_buf);
-        (*Fichas)[animalesTratados + AnimalesLeidos - 1].Peso = strdup(opus_buf);
-        (*Fichas)[animalesTratados + AnimalesLeidos - 1].Cerebro = strdup(duracion_buf);
+        (*Fichas)[animalesTratados + AnimalesLeidos - 1].Numero = strdup(numAnimal_buf);
+        (*Fichas)[animalesTratados + AnimalesLeidos - 1].Clase = strdup(clase_buf);
+        (*Fichas)[animalesTratados + AnimalesLeidos - 1].Orden = strdup(orden_buf);
+        (*Fichas)[animalesTratados + AnimalesLeidos - 1].Genero = strdup(genero_buf);
+        (*Fichas)[animalesTratados + AnimalesLeidos - 1].Especie = strdup(especie_buf);
+        (*Fichas)[animalesTratados + AnimalesLeidos - 1].Peso = strdup(peso_buf);
+        (*Fichas)[animalesTratados + AnimalesLeidos - 1].Cerebro = strdup(cerebro_buf);
 
         animalesTratados++;                       //incrementamos contador de animales tratados
     }
