@@ -17,10 +17,10 @@ void DescartarFichero(ANIMAL **Fichas,WINDOW *Wfichero)
     int i;
     //Comprobación 
     if (*Fichas == NULL || Estadisticas.NumeroFichas == 0) {
-        VentanaError("Error, no hay discos para descartar en este fichero.");
+        VentanaError("Error, no hay animales para descartar en este fichero.");
         return;
     }
-    input=VentanaSN("¿Seguro que quieres decartar todos los animales (S/N)?"); //llamo a la función para mostrar el mensaje y luego guardar la respuesta  
+    input=VentanaSN("¿Seguro que quieres descartar todos los animales (S/N)?"); //llamo a la función para mostrar el mensaje y luego guardar la respuesta  
 
     if(input == 'N'){ //Si la respuesta es no (N) termina 
         return;
@@ -28,9 +28,6 @@ void DescartarFichero(ANIMAL **Fichas,WINDOW *Wfichero)
  
     for(i=0; i<Estadisticas.NumeroFichas; i++){
         //liberar espacio uno por uno 
-        if((*Fichas)[i].Numero!=NULL){
-            free((*Fichas)[i].Numero);
-        }
         if((*Fichas)[i].Clase!=NULL){
             free((*Fichas)[i].Clase);
         }

@@ -16,14 +16,14 @@ void ExportarFichero(ANIMAL **Fichas,WINDOW *Wfichero)
     FILE*archivo;
     char nombreFichero[256];
     int i;
-    char *numAnimal,*clase,*orden,*genero,*especie,*peso, *cerebro;
+    char *clase,*orden,*genero,*especie,*peso, *cerebro;
     //Comprobar si hay animales para exportar 
     if(*Fichas == NULL || Estadisticas.NumeroFichas == 0){
         VentanaError("Error, no hay animales para exportar.");
         return;
     } else{
         //Pedimos el nombre al usuario
-        mvwprintw(Wfichero,2,1,"Introduce el nombre del fichero destino:");
+        mvwprintw(Wfichero,2,1,"Nombre del fichero:");
         wrefresh(Wfichero);
         echo();
         wgetstr(Wfichero, nombreFichero);
@@ -39,29 +39,30 @@ void ExportarFichero(ANIMAL **Fichas,WINDOW *Wfichero)
         }
         
         // escribir la cabecera de animales
-        fprintf(archivo, "Clase;Orden;Genero;Especie;Peso;Tama�o;cerebro\n");
-        //HE CAMBIADO HASTA AQUI, MIRAD TODO PORFA
-        //guardar las estadisticas del dicso 
+        fprintf(archivo, "Clase;Orden;Genero;Especie;Peso;cerebro\n");
+    
+        //guardar las estadisticas
         for(i=0;i<Estadisticas.NumeroFichas;i++){
-            if ((*Fichas)[i].Obra != NULL){
-                obra = (*Fichas)[i].Obra;
+
+            if ((*Fichas)[i].Clase != NULL){
+                clase = (*Fichas)[i].Clase;
             }
-            if ((*Fichas)[i].ApellAutor != NULL){
-                apellAutor = (*Fichas)[i].ApellAutor;
+            if ((*Fichas)[i].Orden != NULL){
+                orden = (*Fichas)[i].Orden;
             }
-            if ((*Fichas)[i].NomAutor != NULL){
-                nomAutor = (*Fichas)[i].NomAutor;
+            if ((*Fichas)[i].Genero != NULL){
+                genero = (*Fichas)[i].Genero;
             }
-            if ((*Fichas)[i].Tonalidad != NULL){
-                tonalidad = (*Fichas)[i].Tonalidad;
+            if ((*Fichas)[i].Especie != NULL){
+                especie = (*Fichas)[i].Especie;
             }
-            if ((*Fichas)[i].Opus != NULL){
-                opus = (*Fichas)[i].Opus;
+            if ((*Fichas)[i].Peso != NULL){
+                peso = (*Fichas)[i].Peso;
             }
-            if ((*Fichas)[i].Duracion != NULL){
-                duracion = (*Fichas)[i].Duracion;
+            if ((*Fichas)[i].Cerebro != NULL){
+                cerebro = (*Fichas)[i].Cerebro;
             }
-            fprintf(archivo,"%s;%s;%s;%s;%s;%s\n",obra, apellAutor, nomAutor, tonalidad, opus, duracion);
+            fprintf(archivo,"%s;%s;%s;%s;%s;%s\n",clase,orden,genero,especie,peso,cerebro);
         }
 
         fclose(archivo);
@@ -72,7 +73,7 @@ void ExportarFichero(ANIMAL **Fichas,WINDOW *Wfichero)
         }
 
         Estadisticas.Fichero = strdup(nombreFichero);
-        mvwprintw(Wfichero, 2, 1, "Se ha exportado con éxito");
+        mvwprintw(Wfichero, 2, 1, "Fichero exportado");
         wrefresh(Wfichero);
         getch();
     }
