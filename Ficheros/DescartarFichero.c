@@ -20,7 +20,7 @@ void DescartarFichero(ANIMAL **Fichas,WINDOW *Wfichero)
         VentanaError("Error, no hay discos para descartar en este fichero.");
         return;
     }
-    input=VentanaSN("¿Seguro que quieres decartar todos los discos (S/N)?"); //llamo a la función para mostrar el mensaje y luego guardar la respuesta  
+    input=VentanaSN("¿Seguro que quieres decartar todos los animales (S/N)?"); //llamo a la función para mostrar el mensaje y luego guardar la respuesta  
 
     if(input == 'N'){ //Si la respuesta es no (N) termina 
         return;
@@ -28,23 +28,26 @@ void DescartarFichero(ANIMAL **Fichas,WINDOW *Wfichero)
  
     for(i=0; i<Estadisticas.NumeroFichas; i++){
         //liberar espacio uno por uno 
-        if((*Fichas)[i].Obra!=NULL){
-            free((*Fichas)[i].Obra);
+        if((*Fichas)[i].Numero!=NULL){
+            free((*Fichas)[i].Numero);
         }
-        if((*Fichas)[i].ApellAutor!=NULL){
-            free((*Fichas)[i].ApellAutor);
+        if((*Fichas)[i].Clase!=NULL){
+            free((*Fichas)[i].Clase);
         }
-        if((*Fichas)[i].Duracion!=NULL){
-            free((*Fichas)[i].Duracion);
+        if((*Fichas)[i].Orden!=NULL){
+            free((*Fichas)[i].Orden);
         }
-        if((*Fichas)[i].NomAutor!=NULL){
-            free((*Fichas)[i].NomAutor);
+        if((*Fichas)[i].Genero!=NULL){
+            free((*Fichas)[i].Genero);
         }
-        if((*Fichas)[i].Opus!=NULL){
-            free((*Fichas)[i].Opus);
+        if((*Fichas)[i].Especie!=NULL){
+            free((*Fichas)[i].Especie);
         }
-        if((*Fichas)[i].Tonalidad!=NULL){
-            free((*Fichas)[i].Tonalidad);
+        if((*Fichas)[i].Peso!=NULL){
+            free((*Fichas)[i].Peso);
+        }
+        if((*Fichas)[i].Cerebro!=NULL){
+            free((*Fichas)[i].Cerebro);
         }
     }
 
@@ -54,7 +57,7 @@ void DescartarFichero(ANIMAL **Fichas,WINDOW *Wfichero)
     Estadisticas.NumeroFichas=0; //Reinicia el contador del número de fichas
     
     //Mostrar el mensaje de éxito (mostrar discos descartados)
-    mvwprintw(Wfichero,2,1,"Discos descartados.");
+    mvwprintw(Wfichero,2,1,"Animales descartados.");
     wrefresh(Wfichero);
     getch();
     return;
