@@ -16,10 +16,10 @@ void ExportarFichero(ANIMAL **Fichas,WINDOW *Wfichero)
     FILE*archivo;
     char nombreFichero[256];
     int i;
-    char *obra,*apellAutor,*nomAutor,*tonalidad,*opus,*duracion;
-    //Comprobar si hay discos para exportar 
+    char *numAnimal,*clase,*orden,*genero,*especie,*peso, *cerebro;
+    //Comprobar si hay animales para exportar 
     if(*Fichas == NULL || Estadisticas.NumeroFichas == 0){
-        VentanaError("Error, no hay discos para exportar.");
+        VentanaError("Error, no hay animales para exportar.");
         return;
     } else{
         //Pedimos el nombre al usuario
@@ -38,8 +38,9 @@ void ExportarFichero(ANIMAL **Fichas,WINDOW *Wfichero)
             return;
         }
         
-        // escribir la cabecera de discos
-        fprintf(archivo, "Obra;ApellAutor;NomAutor;Tonalidad;Opus;Duracion\n");
+        // escribir la cabecera de animales
+        fprintf(archivo, "Clase;Orden;Genero;Especie;Peso;Tama�o;cerebro\n");
+        //HE CAMBIADO HASTA AQUI, MIRAD TODO PORFA
         //guardar las estadisticas del dicso 
         for(i=0;i<Estadisticas.NumeroFichas;i++){
             if ((*Fichas)[i].Obra != NULL){
