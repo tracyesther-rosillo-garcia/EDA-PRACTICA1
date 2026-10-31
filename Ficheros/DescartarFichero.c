@@ -49,11 +49,18 @@ void DescartarFichero(ANIMAL **Fichas,WINDOW *Wfichero)
     }
 
     free(*Fichas); //liberar el espacio del array 
-    *Fichas =NULL; //inicializar la estructura de discos 
+    
+    // liberamos el nombre del fichero para evitar fuga de memoria
+    if (Estadisticas.Fichero != NULL) {
+        free(Estadisticas.Fichero);
+        Estadisticas.Fichero = NULL;
+    }
+
+    *Fichas =NULL; //inicializar la estructura de animales 
     Estadisticas.MaxFichas=0; //Reinia el contador del número máximo de fichas
     Estadisticas.NumeroFichas=0; //Reinicia el contador del número de fichas
     
-    //Mostrar el mensaje de éxito (mostrar discos descartados)
+    //Mostrar el mensaje de éxito (mostrar animales descartados)
     mvwprintw(Wfichero,2,1,"Animales descartados.");
     wrefresh(Wfichero);
     getch();

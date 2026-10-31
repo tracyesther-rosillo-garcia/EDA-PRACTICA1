@@ -38,6 +38,7 @@ void ImportarFichero(ANIMAL **Fichas,WINDOW *Wfichero,bool sumar)
         mvwprintw(Wfichero, 0, (ancho - 28) / 2, "  Importar Fichero de animales");
     }
     wrefresh(Wfichero); 
+    wgetch(Wfichero); //Esperamos a que el usuario escriba antes de seguir
 
     // comprobamos el modo
     if (sumar) {
