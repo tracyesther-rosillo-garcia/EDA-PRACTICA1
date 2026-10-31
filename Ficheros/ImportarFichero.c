@@ -29,28 +29,26 @@ void ImportarFichero(ANIMAL **Fichas,WINDOW *Wfichero,bool sumar)
     int ancho = getmaxx(Wfichero); // calculamos el ancho de la ventana
 
     werase(Wfichero); // Limpiamos la ventana antes de dibujar
-
     DibujarGestionFichero(Wfichero); // Pintamos
-    
+
     if (sumar) {
-        mvwprintw(Wfichero, 0, (ancho - 27) / 2, "  Sumar Fichero de animales");
+        mvwprintw(Wfichero, 0, (ancho - 27) / 2, "  Sumar Fichero de animales  ");
     } else {
-        mvwprintw(Wfichero, 0, (ancho - 28) / 2, "  Importar Fichero de animales");
+        mvwprintw(Wfichero, 0, (ancho - 30) / 2, "  Importar Fichero de animales  ");
     }
     wrefresh(Wfichero); 
-    wgetch(Wfichero); //Esperamos a que el usuario escriba antes de seguir
 
     // comprobamos el modo
     if (sumar) {
         if (Estadisticas.NumeroFichas == 0) { // si pedimos sumar pero no hay fichas da error
-            mvwprintw(Wfichero, 2, 1, "Error, no hay fichas para sumar");
+            mvwprintw(Wfichero, 2, 2, "Error, no hay fichas para sumar");
             wrefresh(Wfichero);
             getch();
             return;
         }
     } else {
         if (Estadisticas.NumeroFichas != 0) { // si importamos pero ya hay fichas da error
-            mvwprintw(Wfichero, 2, 1, "Error, hay fichas existentes");
+            mvwprintw(Wfichero, 2, 2, "Error, hay fichas existentes");
             wrefresh(Wfichero);
             getch();
             return;
@@ -58,14 +56,23 @@ void ImportarFichero(ANIMAL **Fichas,WINDOW *Wfichero,bool sumar)
     } 
 
     // pedir por pantalla el fichero a abrir
-    mvwprintw(Wfichero, 2, 1, "Nombre del fichero:");
+    mvwprintw(Wfichero, 2, 2, "Nombre del fichero: ");
+    wrefresh(Wfichero);
+
     echo(); // habilitamos la visualización de lo que se escribe
     wgetstr(Wfichero, nombreFichero); // leemos la cadena del fichero
     noecho(); // deshabilitamos la visualización
 
+    if (strlen(nombreFichero) == 0) {
+        mvwprintw(Wfichero, 4, 2, "Error, debe indicar un nombre de archivo valido.");
+        wrefresh(Wfichero);
+        getch();
+        return;
+    }
+
     fichero = fopen(nombreFichero, "r"); // abre el fichero en modo lectura 'r'
     if (fichero == NULL) {
-        mvwprintw(Wfichero, 4, 1, "Error al abrir el fichero: %s", strerror(errno));
+        mvwprintw(Wfichero, 4, 2, "Error al abrir el fichero: %s", strerror(errno));
         wrefresh(Wfichero);
         getch();
         return;
@@ -80,7 +87,7 @@ void ImportarFichero(ANIMAL **Fichas,WINDOW *Wfichero,bool sumar)
 
     // comprobamos lo que se ha leído
     if (AnimalesLeidos < 2) { // así lee la cabecera o nada
-        mvwprintw(Wfichero, 4, 1, "Error, el fichero no contiene animales para importar.");
+        mvwprintw(Wfichero, 4, 2, "Error, el fichero no contiene animales para importar.");
         wrefresh(Wfichero);
         getch();
         fclose(fichero);
@@ -95,11 +102,10 @@ void ImportarFichero(ANIMAL **Fichas,WINDOW *Wfichero,bool sumar)
         posicionInicial = 0;
     }
 
-
     ANIMAL *nuevasFichas = realloc(*Fichas, (posicionInicial + totalAnimales) * sizeof(ANIMAL));
 
     if (nuevasFichas == NULL) { // si realloc falla, no hacemos nada
-        mvwprintw(Wfichero, 4, 1, "Error de memoria al redimensionar."); 
+        mvwprintw(Wfichero, 4, 2, "Error de memoria al redimensionar."); 
         wrefresh(Wfichero);
         getch();
         fclose(fichero);
@@ -119,11 +125,11 @@ void ImportarFichero(ANIMAL **Fichas,WINDOW *Wfichero,bool sumar)
         }
 
         i = strlen(buffer); // longitud de la línea actual
-        while(i>0){
-            if (i > 0 && (buffer[i - 1] == '\n' || buffer[i - 1] == '\r')) { 
+        while (i > 0) {
+            if (buffer[i - 1] == '\n' || buffer[i - 1] == '\r') { 
                 buffer[i - 1] = '\0';
                 i--; // elimina salto de línea final
-            }else{
+            } else {
                 break;
             }
         }
@@ -143,12 +149,6 @@ void ImportarFichero(ANIMAL **Fichas,WINDOW *Wfichero,bool sumar)
             animalesDescartados++;
             continue; // descartamos esta ficha y pasamos a la siguiente
         }
-
-        if (*genero_buf == '\0') {
-            animalesDescartados++;
-            continue; // descartamos esta ficha y pasamos a la siguiente
-        }
-
 
         // Asignamos los 6 campos a la estructura ANIMAL
         if (clase_buf != NULL) {
@@ -202,21 +202,19 @@ void ImportarFichero(ANIMAL **Fichas,WINDOW *Wfichero,bool sumar)
     Estadisticas.Fichero = strdup(nombreFichero);
     Estadisticas.NumeroFichas = posicionInicial + animalesTratados;
 
-    // Limpiamos y redibujamos la pantalla final
+    // Redibujado limpio
     werase(Wfichero);
     DibujarGestionFichero(Wfichero);
     
     if (sumar) {
-        mvwprintw(Wfichero, 0, (ancho - 27) / 2, "  Sumar Fichero de animales");
+        mvwprintw(Wfichero, 0, (ancho - 27) / 2, "  Sumar Fichero de animales  ");
     } else {
-        mvwprintw(Wfichero, 0, (ancho - 28) / 2, "  Importar Fichero de animales");
+        mvwprintw(Wfichero, 0, (ancho - 30) / 2, "  Importar Fichero de animales  ");
     }
 
-    mvwprintw(Wfichero, 2, 1, "Nombre del fichero: %s", Estadisticas.Fichero);
-    mvwprintw(Wfichero, 3, 1, "Fichas tratadas: %-6d Fichas descartadas: %-6d", animalesTratados, animalesDescartados);
+    mvwprintw(Wfichero, 2, 2, "Nombre del fichero: %s", Estadisticas.Fichero);
+    mvwprintw(Wfichero, 3, 2, "Fichas tratadas: %d       Fichas descartadas: %d", animalesTratados, animalesDescartados);
     wrefresh(Wfichero);
 
     VentanaError("Fichero importado correctamente");
-    getch();
-    return;
 }
