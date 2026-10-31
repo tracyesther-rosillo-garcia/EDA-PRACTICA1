@@ -33,9 +33,9 @@ void ImportarFichero(ANIMAL **Fichas,WINDOW *Wfichero,bool sumar)
     DibujarGestionFichero(Wfichero); // Pintamos
     
     if (sumar) {
-        mvwprintw(Wfichero, 0, (ancho - 27) / 2, "  Sumar Fichero de animales");
+        mvwprintw(Wfichero, 0, (ancho - 31) / 2, "   Sumar Fichero de animales   ");
     } else {
-        mvwprintw(Wfichero, 0, (ancho - 28) / 2, "  Importar Fichero de animales");
+        mvwprintw(Wfichero, 0, (ancho - 32) / 2, "  Importar Fichero de animales  ");
     }
     wrefresh(Wfichero); 
     wgetch(Wfichero); //Esperamos a que el usuario escriba antes de seguir
@@ -207,13 +207,13 @@ void ImportarFichero(ANIMAL **Fichas,WINDOW *Wfichero,bool sumar)
     DibujarGestionFichero(Wfichero);
     
     if (sumar) {
-        mvwprintw(Wfichero, 0, (ancho - 27) / 2, "  Sumar Fichero de animales");
+        mvwprintw(Wfichero, 0, (ancho - 31) / 2, "   Sumar Fichero de animales   ");
     } else {
-        mvwprintw(Wfichero, 0, (ancho - 28) / 2, "  Importar Fichero de animales");
+        mvwprintw(Wfichero, 0, (ancho - 32) / 2, "  Importar Fichero de animales  ");
     }
 
-    mvwprintw(Wfichero, 2, 1, "Nombre del fichero: %s", Estadisticas.Fichero);
-    mvwprintw(Wfichero, 3, 1, "Fichas tratadas: %-6d Fichas descartadas: %-6d", animalesTratados, animalesDescartados);
+    mvwprintw(Wfichero, 2, 1, "Nombre del fichero: %s               ", Estadisticas.Fichero);
+    mvwprintw(Wfichero, 3, 1, "Fichas tratadas: %-6d Fichas descartadas: %-6d               ", animalesTratados, animalesDescartados);
     wrefresh(Wfichero);
 
     VentanaError("Fichero importado correctamente");
