@@ -17,11 +17,20 @@ void ExportarFichero(ANIMAL **Fichas,WINDOW *Wfichero)
     char nombreFichero[256];
     int i;
     char *clase,*orden,*genero,*especie,*peso, *cerebro;
+    
     //Comprobar si hay animales para exportar 
     if(*Fichas == NULL || Estadisticas.NumeroFichas == 0){
         VentanaError("Error, no hay animales para exportar.");
         return;
-    } else{
+    } else {
+        // Limpiamos y dibujamos la ventana ANTES de pedir el nombre
+        werase(Wfichero);
+        DibujarGestionFichero(Wfichero);
+        
+        // Ponemos el título centrado
+        int ancho = getmaxx(Wfichero);
+        mvwprintw(Wfichero, 0, (ancho - 32) / 2, "  Exportar Fichero de animales  ");
+
         //Pedimos el nombre al usuario
         mvwprintw(Wfichero,2,1,"Nombre del fichero:");
         wrefresh(Wfichero);
@@ -61,16 +70,19 @@ void ExportarFichero(ANIMAL **Fichas,WINDOW *Wfichero)
             } else {
                 genero = "";
             }
+            
             if ((*Fichas)[i].Especie != NULL){
                 especie = (*Fichas)[i].Especie;
             } else {
                 especie = "";
             }
+            
             if ((*Fichas)[i].Peso != NULL){
                 peso = (*Fichas)[i].Peso;
             } else {
                 peso = "";
             }
+            
             if ((*Fichas)[i].Cerebro != NULL){
                 cerebro = (*Fichas)[i].Cerebro;
             } else {
@@ -81,6 +93,7 @@ void ExportarFichero(ANIMAL **Fichas,WINDOW *Wfichero)
         }
 
         fclose(archivo);
+        
         // Actualizar estadísticas
         if (Estadisticas.Fichero != NULL) {
             free(Estadisticas.Fichero);
@@ -88,7 +101,9 @@ void ExportarFichero(ANIMAL **Fichas,WINDOW *Wfichero)
         }
 
         Estadisticas.Fichero = strdup(nombreFichero);
-        mvwprintw(Wfichero, 2, 1, "Fichero exportado");
+        
+        // Mensaje de éxito con espacios al final para borrar el texto anterior (el fantasma)
+        mvwprintw(Wfichero, 2, 1, "Fichero exportado                                     ");
         wrefresh(Wfichero);
         getch();
     }
