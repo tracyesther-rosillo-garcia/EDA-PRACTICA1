@@ -25,17 +25,25 @@ void ExportarFichero(ANIMAL **Fichas,WINDOW *Wfichero)
     } else {
         // Limpiamos y dibujamos la ventana ANTES de pedir el nombre
         werase(Wfichero);
+        wclear(Wfichero);
         DibujarGestionFichero(Wfichero);
-        
-        // Ponemos el título centrado
+
         int ancho = getmaxx(Wfichero);
-        mvwprintw(Wfichero, 0, (ancho - 32) / 2, "  Exportar Fichero de animales  ");
+        const char *titulo = "Exportar fichero de animales";
+        int posicionTitulo = (ancho - (int)strlen(titulo)) / 2;
+
+        wcolor_set(Wfichero, 6, NULL);
+        mvwprintw(Wfichero, 0, posicionTitulo, "%s", titulo);
+        wcolor_set(Wfichero, 0, NULL);
+
+        touchwin(Wfichero);
+        wrefresh(Wfichero);
 
         //Pedimos el nombre al usuario
         mvwprintw(Wfichero,2,1,"Nombre del fichero:");
         wrefresh(Wfichero);
         echo();
-        wgetstr(Wfichero, nombreFichero);
+        wgetstr(Wfichero, nombreFichero, sizeof(nombreFichero) - 1);
         noecho();
 
         //Abrimos el fichero
@@ -103,7 +111,7 @@ void ExportarFichero(ANIMAL **Fichas,WINDOW *Wfichero)
         Estadisticas.Fichero = strdup(nombreFichero);
         
         // Mensaje de éxito con espacios al final para borrar el texto anterior (el fantasma)
-        mvwprintw(Wfichero, 2, 1, "Fichero exportado                                     ");
+        mvwprintw(Wfichero, 2, 1, "%-70s", "Fichero exportado correctamente");
         wrefresh(Wfichero);
         getch();
     }
