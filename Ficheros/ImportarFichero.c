@@ -89,48 +89,42 @@ void ImportarFichero(ANIMAL **Fichas,WINDOW *Wfichero,bool sumar)
 
     totalAnimales = AnimalesLeidos - 1; // restamos 1 por la cabecera
     int posicionInicial = 0; 
-    if (sumar) {
-        posicionInicial = Estadisticas.NumeroFichas;
-    } else {
-        posicionInicial = 0;
-    }
+    int posicionInicial = sumar ? Estadisticas.NumeroFichas : 0;
+    int numeroAnterior = Estadisticas.NumeroFichas;
 
+    /*
+    * Reservamos espacio para los animales actuales más los nuevos.
+    * Se resta la cabecera del CSV porque no es un animal.
+    */
+    int capacidadNecesaria = posicionInicial + (AnimalesLeidos - 1);
 
-    ANIMAL *nuevasFichas = realloc(*Fichas, (posicionInicial + totalAnimales) * sizeof(ANIMAL));
+    ANIMAL *nuevasFichas = realloc(*Fichas,capacidadNecesaria * sizeof(ANIMAL));
 
-    if (nuevasFichas == NULL) { // si realloc falla, no hacemos nada
-        mvwprintw(Wfichero, 4, 1, "Error de memoria al redimensionar."); 
+    if (nuevasFichas == NULL) {
+        mvwprintw(Wfichero, 4, 1,"Error de memoria al redimensionar.");
         wrefresh(Wfichero);
         getch();
         fclose(fichero);
         return;
     }
 
-    *Fichas = nuevasFichas; // actualizamos el puntero
-    Estadisticas.MaxFichas = posicionInicial + totalAnimales; // actualizamos capacidad máxima
+    *Fichas = nuevasFichas;
 
-    rewind(fichero); // volvemos al inicio del fichero para leer las líneas
+    rewind(fichero);
+
     bool esCabecera = true;
+    int animalesTratados = 0;
 
     while (fgets(buffer, MAX_BUF, fichero) != NULL) {
-        if (esCabecera) { 
+        if (esCabecera) {
             esCabecera = false;
-            continue; // salto la cabecera
+            continue;
         }
 
-        i = strlen(buffer); // longitud de la línea actual
-        while(i>0){
-            if (i > 0 && (buffer[i - 1] == '\n' || buffer[i - 1] == '\r')) { 
-                buffer[i - 1] = '\0';
-                i--; // elimina salto de línea final
-            }else{
-                break;
-            }
-        }
+        buffer[strcspn(buffer, "\r\n")] = '\0';
 
-        char *buffer_ptr = buffer; // puntero auxiliar para strsep
+        char *buffer_ptr = buffer;
 
-        // Separamos exactamente las 6 columnas del CSV original
         char *clase_buf   = strsep(&buffer_ptr, ";");
         char *orden_buf   = strsep(&buffer_ptr, ";");
         char *genero_buf  = strsep(&buffer_ptr, ";");
@@ -138,57 +132,25 @@ void ImportarFichero(ANIMAL **Fichas,WINDOW *Wfichero,bool sumar)
         char *peso_buf    = strsep(&buffer_ptr, ";");
         char *cerebro_buf = strsep(&buffer_ptr, ";");
 
-        // Comprobamos que el género (campo obligatorio) no esté vacío
         if (genero_buf == NULL || *genero_buf == '\0') {
             animalesDescartados++;
-            continue; // descartamos esta ficha y pasamos a la siguiente
+            continue;
         }
 
-        if (*genero_buf == '\0') {
-            animalesDescartados++;
-            continue; // descartamos esta ficha y pasamos a la siguiente
-        }
+        ANIMAL *animal = &(*Fichas)[posicionInicial + animalesTratados];
 
+        animal->Clase = clase_buf != NULL ? strdup(clase_buf) : strdup("");
+        animal->Orden = orden_buf != NULL ? strdup(orden_buf) : strdup("");
+        animal->Genero = strdup(genero_buf);
+        animal->Especie = especie_buf != NULL ? strdup(especie_buf) : strdup("");
+        animal->Peso = peso_buf != NULL ? strdup(peso_buf) : strdup("");
+        animal->Cerebro = cerebro_buf != NULL ? strdup(cerebro_buf) : strdup("");
 
-        // Asignamos los 6 campos a la estructura ANIMAL
-        if (clase_buf != NULL) {
-            (*Fichas)[posicionInicial + animalesTratados].Clase = strdup(clase_buf);
-        } else {
-            (*Fichas)[posicionInicial + animalesTratados].Clase = strdup("");
-        }
-
-        if (orden_buf != NULL) {
-            (*Fichas)[posicionInicial + animalesTratados].Orden = strdup(orden_buf);
-        } else {
-            (*Fichas)[posicionInicial + animalesTratados].Orden = strdup("");
-        }
-
-        if (genero_buf != NULL) {
-            (*Fichas)[posicionInicial + animalesTratados].Genero = strdup(genero_buf);
-        } else {
-            (*Fichas)[posicionInicial + animalesTratados].Genero = strdup("");
-        }
-
-        if (especie_buf != NULL) {
-            (*Fichas)[posicionInicial + animalesTratados].Especie = strdup(especie_buf);
-        } else {
-            (*Fichas)[posicionInicial + animalesTratados].Especie = strdup("");
-        }
-
-        if (peso_buf != NULL) {
-            (*Fichas)[posicionInicial + animalesTratados].Peso = strdup(peso_buf);
-        } else {
-            (*Fichas)[posicionInicial + animalesTratados].Peso = strdup("");
-        }
-
-        if (cerebro_buf != NULL) {
-            (*Fichas)[posicionInicial + animalesTratados].Cerebro = strdup(cerebro_buf);
-        } else {
-            (*Fichas)[posicionInicial + animalesTratados].Cerebro = strdup("");
-        }
-
-        animalesTratados++; // incrementamos contador de animales tratados
+        animalesTratados++;
     }
+
+    Estadisticas.NumeroFichas = numeroAnterior + animalesTratados;
+    Estadisticas.MaxFichas = capacidadNecesaria;
 
     fclose(fichero);
     gettimeofday(&tiempoFinal, NULL);
@@ -200,7 +162,6 @@ void ImportarFichero(ANIMAL **Fichas,WINDOW *Wfichero,bool sumar)
         free(Estadisticas.Fichero);
     }
     Estadisticas.Fichero = strdup(nombreFichero);
-    Estadisticas.NumeroFichas = posicionInicial + animalesTratados;
 
     // Limpiamos y redibujamos la pantalla final
     werase(Wfichero);
